@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 使用构造函数创建bean 无参-->
+    <bean id="user" class="local.test.spring.ioc.User">
+    </bean>
+
+    <!-- 使用构造函数创建bean 有参 -->
+    <bean id="person" class="local.test.spring.ioc.Person">
+        <constructor-arg name="name" value="zhangsan"/>
+        <constructor-arg name="age" value="12"/>
+    </bean>
+
+    <!-- 使用无参构造函数创建bean 并注入属性 -->
+    <bean id="user1" class="local.test.spring.ioc.User">
+        <property name="name" value="lisi"/>
+    </bean>
+
+    <!-- 使用静态工厂 -->
+    <bean id="user2" class="local.test.spring.ioc.UserFactory" factory-method="createInstance"/>
+
+    <!-- 使用动态工厂 -->
+    <bean id="personFactory" class="local.test.spring.ioc.PersonFactory" factory-method="getInstance"/>
+    <bean id="person1" factory-bean="personFactory" factory-method="createPerson"/>
+
+    <!-- 生命周期 -->
+    <bean id="student" class="local.test.spring.ioc.Student" scope="singleton">
+    </bean>
+    <bean id="student1" class="local.test.spring.ioc.Student" scope="prototype">
+    </bean>
+
+    <!--抽象bean， 让实际对象继承， abstract + parent -->
+    <bean id="product" class="local.test.spring.ioc.AbstractProduct" abstract="true">
+        <property name="company" value="HuaWei"/>
+    </bean>
+    <bean id="productA" class="local.test.spring.ioc.ProductA" parent="product">
+        <property name="name" value="P20"/>
+        <property name="price" value="2199"/>
+    </bean>
+
+<!--    其他注入属性方式-->
+    <bean id="valueGenerator" class="local.test.spring.ioc.ValueGenerator"/>
+    <bean id="messageService0" class="local.test.spring.ioc.MessageServiceImpl"/>
+    <bean id="sporter" class="local.test.spring.ioc.Sporter">
+        <property name="name">
+            <value type="java.lang.String">YaoMing</value>
+        </property>
+        <property name="age" value="30"/>
+        <!--        set-->
+        <property name="scores1">
+            <set>
+                <value>10</value>
+                <value>20</value>
+            </set>
+        </property>
+        <!--        map-->
+        <property name="scores2">
+            <map>
+                <entry>
+                    <key>
+                        <value>aa</value>
+                    </key>
+                    <value>100</value>
+                </entry>
+            </map>
+        </property>
+        <property name="num">
+            <!--使用方法获取值-->
+            <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+                <property name="targetObject" ref="valueGenerator"/>
+                <property name="targetMethod" value="getValue"/>
+            </bean>
+        </property>
+        <property name="messageService" ref="messageService0"/>
+    </bean>
+
+    <!--    Autowire: 自动装配属性 类型或属性名字-->
+    <bean id="messageService" class="local.test.spring.ioc.MessageServiceImpl"/>
+    <bean id="helloService" class="local.test.spring.ioc.HelloServiceImpl" autowire="byName"/>
+
+    <!--    使用init/destory-->
+    <bean id="helloService1" class="local.test.spring.ioc.HelloServiceImpl" init-method="init"
+          destroy-method="destory"/>
+
+    <!--    lazy init: 当bean做为属性注入的时候 lazy init bean-->
+    <bean id="helloService2" class="local.test.spring.ioc.HelloServiceImpl" lazy-init="true"/>
+
+</beans>
