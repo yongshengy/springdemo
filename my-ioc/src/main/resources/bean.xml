@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean id="user" class="local.test.myioc.User">
+        <property name="id" value="1"/>
+        <property name="name" value="yyang"/>
+    </bean>
+</beans>
