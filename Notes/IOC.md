@@ -14,7 +14,10 @@
 
 > 参考：
 > - [IOC 之深入理解 Spring IoC](https://mp.weixin.qq.com/s/nCvZ9NbNQeD_FtJyho4owg)
-
+- 容器：为特定组件提供支持环境;
+    - Tomcat是Servlet容器，为Servlet的运行提供运行环境，底层实现了TCP连接，解析HTTP协议.
+    - Docker提供了必要的linux环境以便运行特定的linux进程
+    - Spring核心是提供了IOC容器，管理所有轻量级的JavaBean组件，底层服务包含组件的生命周期，配置和组装服务，AOP支持等
 - BeanFactory是基础容器，内部维护着BeanDefinition map，并可根据BeanDefinition的描述进行bean的创建和管理。
     - 三个子类：ListableBeanFactory, HierarchicalBeanFactory, AutowireCapableBeanFactory
     - DefaultListableBeanFactory是最终实现，实现的所有的接口
@@ -26,6 +29,8 @@
     - 扩展了ResourceLoader，可以加载多个Resource
     - 对Web的支持
 - 简单说就是将配置文件进行解析（XML或注解其他形式），然后放到一个Map中。       
+- BeanFactory和ApplicationContext区别：BeanFactory实现是按需创建，第一次获取的时候创建Bean，而ApplicationContext是一次性创建所有Bean；
+  ApplicationContext是从BeanFactory继承的，只是提供了额外的功能，包括国际化支持，事件和通知机制等。
 
 ### XML配置
 
@@ -116,7 +121,7 @@ public class UserDynamicFactory {
 
 > xml方式配置太多，而且需要java和xml之间不断切换
 
-- @Autowired 自动装配，针对属性或构造函数参数查找bean；默认按类型匹配
+- @Autowired 自动装配，针对属性或构造函数参数查找bean；默认按类型匹配；可以写在属性上，set方法上，构造方法中
 - @Qualifier 指定注入Bean的名称，也是针对属性或构造函数参数查找bean，针对相同类型多个对象，使用@Autowired不知道取哪个
 - @Resource 默认name匹配，找不到再找type，也是针对属性或构造函数参数查找bean。
 - @Resource是J2EE中得注解，建议使用；
@@ -135,15 +140,21 @@ public class UserDynamicFactory {
 - @Repository用于标注数据访问组件，即DAO组件。
 - @Service用于标注业务层组件、 
 - @Controller用于标注控制层组件（如struts中的action）
-- @Scope用于指定scope作用域的（用在类上）
+- @Scope用于指定scope作用域的（用在类上）,默认是prototype,可以修改为singleton; ConfigurableBeanFactory.SCOPE_PROTOTYPE
 - @Autowired 默认按类型装配，如果我们想使用按名称装配，可以结合@Qualifier注解一起使用。如下：
 - @Autowired @Qualifier("personDaoBean") 存在多个实例配合使用
 - @Resource默认按名称装配，当找不到与名称匹配的bean才会按类型装配。
-- @PostConstruct用于指定初始化方法（用在方法上）
-- @PreDestory用于指定销毁方法（用在方法上）
+- @Order Bean注入List的时候的顺序，放在类上
+- @PostConstruct用于指定初始化方法（用在方法上）； JSR-250定义的Annotation
+- @PreDestory用于指定销毁方法（用在方法上）； JSR-250定义的Annotation
 - @DependsOn：定义Bean初始化及销毁时的顺序
 - @Primary：自动装配时当出现多个Bean候选者时，被注解为@Primary的Bean将作为首选者，否则将抛出异常
 - @PostConstruct 初始化注解
 - @PreDestroy 摧毁注解 默认 单例  启动就加载
 - @Async异步方法调用
+- 创建第三方Bean: 如果需要一个第三方的Bean，可以在类中编写一个方法创建和返回，使用@Bean注解
+- @Value: 注入值，一般是从配置文件中读取值。或者结合@PropertySource("app.properties")  @Value("${app.zone:Z}")， 或者@Value("#{smtpConfig.host}")从JavaBean中读取
+- @Conditonal(OnSmtpEnvCondition.class) 满足条件才会创建Bean 实现Condition接口的match方法；比如上传操作开发上传到本地，生产环境到S3
+
+
 
